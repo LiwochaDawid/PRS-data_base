@@ -1,99 +1,106 @@
-CREATE DATABASE PatientRegistrationSystem;
-USE PatientRegistrationSystem;
+-- DROP DATABASE prs_database;
 
-CREATE TABLE `Accounts` (
-	`accountID` int NOT NULL AUTO_INCREMENT,
+CREATE DATABASE prs_database;
+USE prs_database;
+
+CREATE TABLE `accounts` (
+	`account_id` int NOT NULL AUTO_INCREMENT,
+	`email` varchar(50) NOT NULL UNIQUE,
 	`login` varchar(20) NOT NULL UNIQUE,
 	`password` varchar(255) NOT NULL,
 	`salt` varchar(255) NOT NULL,
-	PRIMARY KEY (`accountID`)
+	PRIMARY KEY (`account_id`)
 );
 
-CREATE TABLE `Doctors` (
-	`doctorID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `doctors` (
+	`doctor_id` int NOT NULL AUTO_INCREMENT,
 	`name` varchar(20) NOT NULL,
 	`surname` varchar(50) NOT NULL,
 	`prefix` varchar(20) NOT NULL,
 	`street` varchar(50) NOT NULL,
-	`postCode` varchar(20) NOT NULL,
+	`postcode` varchar(20) NOT NULL,
 	`city` varchar(50) NOT NULL,
 	`country` varchar(50) NOT NULL,
-	`phoneNumber` varchar(20) NOT NULL,
-	`email` varchar(50) NOT NULL UNIQUE,
-	`accountID` int NOT NULL,
-	PRIMARY KEY (`doctorID`)
+	`phone_number` varchar(20) NOT NULL,
+	`account_id` int NOT NULL,
+	PRIMARY KEY (`doctor_id`)
 );
 
-CREATE TABLE `Patients` (
-	`patientID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `patients` (
+	`patient_id` int NOT NULL AUTO_INCREMENT,
 	`name` varchar(20) NOT NULL,
 	`surname` varchar(50) NOT NULL,
 	`street` varchar(50) NOT NULL,
-	`postCode` varchar(20) NOT NULL,
+	`postcode` varchar(20) NOT NULL,
 	`city` varchar(50) NOT NULL,
 	`country` varchar(50) NOT NULL,
-	`phoneNumber` varchar(20) NOT NULL,
-	`email` varchar(50),
-	`accountID` int NOT NULL,
-	PRIMARY KEY (`patientID`)
+	`phone_number` varchar(20) NOT NULL,
+	`account_id` int NULL,
+	PRIMARY KEY (`patient_id`)
 );
 
-CREATE TABLE `Visits` (
-	`visitID` int NOT NULL AUTO_INCREMENT,
-	`patientID` int NOT NULL,
-	`doctorID` int NOT NULL,
+CREATE TABLE `visits` (
+	`visit_id` int NOT NULL AUTO_INCREMENT,
+	`patient_id` int NOT NULL,
+	`doctor_id` int NOT NULL,
 	`date` DATETIME NOT NULL,
-	`purposeID` int NOT NULL,
-	`comment` TEXT NOT NULL,
-	PRIMARY KEY (`visitID`)
+	`purpose_id` int NOT NULL,
+	`comment` TEXT NULL,
+	PRIMARY KEY (`visit_id`)
 );
 
-CREATE TABLE `Purposes` (
-	`purposeID` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `purposes` (
+	`purpose_id` int NOT NULL AUTO_INCREMENT,
 	`name` varchar(50) NOT NULL,
-	`description` TEXT NOT NULL,
+	`description` TEXT NULL,
 	`duration` TIME NOT NULL,
-	`price` int NOT NULL,
-	`doctorID` int NOT NULL,
-	PRIMARY KEY (`purposeID`)
+	`price` int NULL,
+	`doctor_id` int NOT NULL,
+	PRIMARY KEY (`purpose_id`)
 );
 
-CREATE TABLE `RegistrationConfigurations` (
-	`registrationConfigurationID` int NOT NULL AUTO_INCREMENT,
-	`workStart` TIME NOT NULL,
-	`workEnd` TIME NOT NULL,
-	`registrationTerm` DATE NOT NULL,
-	`maxVisitsNumber` int NOT NULL,
-	`doctorID` int NOT NULL,
-	PRIMARY KEY (`registrationConfigurationID`)
+CREATE TABLE `registration_configurations` (
+	`registration_configuration_id` int NOT NULL AUTO_INCREMENT,
+	`work_start` TIME NOT NULL,
+	`work_end` TIME NOT NULL,
+	`registration_term` DATE NOT NULL,
+	`max_visits` int NOT NULL,
+	`doctor_id` int NOT NULL,
+	PRIMARY KEY (`registration_configuration_id`)
 );
 
-CREATE TABLE `PastVisits` (
-	`visitID` int NOT NULL AUTO_INCREMENT,
-	`patientID` int NOT NULL,
-	`doctorID` int NOT NULL,
+CREATE TABLE `past_visits` (
+	`visit_id` int NOT NULL AUTO_INCREMENT,
+	`patient_id` int NOT NULL,
+	`doctor_id` int NOT NULL,
 	`date` DATETIME NOT NULL,
-	`purposeID` int NOT NULL,
-	`patientAppearance` bool NOT NULL,
-	PRIMARY KEY (`visitID`)
+	`purpose_id` int NOT NULL,
+	`patient_appearance` bool NOT NULL,
+	PRIMARY KEY (`visit_id`)
 );
 
-ALTER TABLE `Doctors` ADD CONSTRAINT `Doctors_fk0` FOREIGN KEY (`accountID`) REFERENCES `Accounts`(`accountID`);
+ALTER TABLE `doctors` ADD CONSTRAINT `doctors_fk0` FOREIGN KEY (`account_id`) REFERENCES `accounts`(`account_id`);
 
-ALTER TABLE `Patients` ADD CONSTRAINT `Patients_fk0` FOREIGN KEY (`accountID`) REFERENCES `Accounts`(`accountID`);
+ALTER TABLE `patients` ADD CONSTRAINT `patients_fk0` FOREIGN KEY (`account_id`) REFERENCES `accounts`(`account_id`);
 
-ALTER TABLE `Visits` ADD CONSTRAINT `Visits_fk0` FOREIGN KEY (`patientID`) REFERENCES `Patients`(`patientID`);
+ALTER TABLE `visits` ADD CONSTRAINT `visits_fk0` FOREIGN KEY (`patient_id`) REFERENCES `patients`(`patient_id`);
 
-ALTER TABLE `Visits` ADD CONSTRAINT `Visits_fk1` FOREIGN KEY (`doctorID`) REFERENCES `Doctors`(`doctorID`);
+ALTER TABLE `visits` ADD CONSTRAINT `visits_fk1` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
 
-ALTER TABLE `Visits` ADD CONSTRAINT `Visits_fk2` FOREIGN KEY (`purposeID`) REFERENCES `Purposes`(`purposeID`);
+ALTER TABLE `visits` ADD CONSTRAINT `visits_fk2` FOREIGN KEY (`purpose_id`) REFERENCES `purposes`(`purpose_id`);
 
-ALTER TABLE `Purposes` ADD CONSTRAINT `Purposes_fk0` FOREIGN KEY (`doctorID`) REFERENCES `Doctors`(`doctorID`);
+ALTER TABLE `purposes` ADD CONSTRAINT `purposes_fk0` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
 
-ALTER TABLE `RegistrationConfigurations` ADD CONSTRAINT `RegistrationConfigurations_fk0` FOREIGN KEY (`doctorID`) REFERENCES `Doctors`(`doctorID`);
+ALTER TABLE `registration_configurations` ADD CONSTRAINT `registration_configurations_fk0` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
 
-ALTER TABLE `PastVisits` ADD CONSTRAINT `PastVisits_fk0` FOREIGN KEY (`patientID`) REFERENCES `Patients`(`patientID`);
+ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk0` FOREIGN KEY (`patient_id`) REFERENCES `patients`(`patient_id`);
 
-ALTER TABLE `PastVisits` ADD CONSTRAINT `PastVisits_fk1` FOREIGN KEY (`doctorID`) REFERENCES `Doctors`(`doctorID`);
+ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk1` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
 
-ALTER TABLE `PastVisits` ADD CONSTRAINT `PastVisits_fk2` FOREIGN KEY (`purposeID`) REFERENCES `Purposes`(`purposeID`);
+ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk2` FOREIGN KEY (`purpose_id`) REFERENCES `purposes`(`purpose_id`);
+
+-- test rescords
+insert into accounts values (1, 'liwdaw@gmail.com', 'liwdaw', 'password', 'salt');
+insert into accounts values (2, 'gormac@gmail.com', 'gormac', 'password', 'salt');
+insert into doctors values (1, 'Dawid', 'Liwocha', 'lek. dent.', 'Mazowiecka 10', '97-400', 'Bełchatów', 'Polska', '663683233', 1);
+insert into doctors values (2, 'Maciej', 'Gorczyca', 'lek. dent.', 'Warszawska 20', '97-400', 'Bełchatów', 'Polska', '604875332', 2);
