@@ -5,10 +5,10 @@ USE prs_database;
 
 CREATE TABLE `accounts` (
 	`account_id` int NOT NULL AUTO_INCREMENT,
-	`email` varchar(50) NOT NULL UNIQUE,
-	`login` varchar(20) NOT NULL UNIQUE,
+	`username` varchar(50) NOT NULL UNIQUE,
 	`password` varchar(255) NOT NULL,
-	`salt` varchar(255) NOT NULL,
+	`role` varchar(20) NOT NULL,
+	`enabled` boolean NOT NULL,
 	PRIMARY KEY (`account_id`)
 );
 
@@ -59,24 +59,26 @@ CREATE TABLE `purposes` (
 	PRIMARY KEY (`purpose_id`)
 );
 
-CREATE TABLE `registration_configurations` (
-	`registration_configuration_id` int NOT NULL AUTO_INCREMENT,
-	`work_start` TIME NOT NULL,
-	`work_end` TIME NOT NULL,
+CREATE TABLE `configurations` (
+	`configuration_id` int NOT NULL AUTO_INCREMENT,
+	`mo_work_start` TIME NOT NULL,
+	`mo_work_end` TIME NOT NULL,
+	`tu_work_start` TIME NOT NULL,
+	`tu_work_end` TIME NOT NULL,
+	`we_work_start` TIME NOT NULL,
+	`we_work_end` TIME NOT NULL,
+	`th_work_start` TIME NOT NULL,
+	`th_work_end` TIME NOT NULL,
+	`fr_work_start` TIME NOT NULL,
+	`fr_work_end` TIME NOT NULL,
+	`sa_work_start` TIME NOT NULL,
+	`sa_work_end` TIME NOT NULL,
+	`su_work_start` TIME NOT NULL,
+	`su_work_end` TIME NOT NULL,
 	`registration_term` DATE NOT NULL,
 	`max_visits` int NOT NULL,
 	`doctor_id` int NOT NULL,
-	PRIMARY KEY (`registration_configuration_id`)
-);
-
-CREATE TABLE `past_visits` (
-	`visit_id` int NOT NULL AUTO_INCREMENT,
-	`patient_id` int NOT NULL,
-	`doctor_id` int NOT NULL,
-	`date` DATETIME NOT NULL,
-	`purpose_id` int NOT NULL,
-	`patient_appearance` bool NOT NULL,
-	PRIMARY KEY (`visit_id`)
+	PRIMARY KEY (`configuration_id`)
 );
 
 ALTER TABLE `doctors` ADD CONSTRAINT `doctors_fk0` FOREIGN KEY (`account_id`) REFERENCES `accounts`(`account_id`);
@@ -91,16 +93,4 @@ ALTER TABLE `visits` ADD CONSTRAINT `visits_fk2` FOREIGN KEY (`purpose_id`) REFE
 
 ALTER TABLE `purposes` ADD CONSTRAINT `purposes_fk0` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
 
-ALTER TABLE `registration_configurations` ADD CONSTRAINT `registration_configurations_fk0` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
-
-ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk0` FOREIGN KEY (`patient_id`) REFERENCES `patients`(`patient_id`);
-
-ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk1` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
-
-ALTER TABLE `past_visits` ADD CONSTRAINT `past_visits_fk2` FOREIGN KEY (`purpose_id`) REFERENCES `purposes`(`purpose_id`);
-
--- test rescords
-insert into accounts values (1, 'liwdaw@gmail.com', 'liwdaw', 'password', 'salt');
-insert into accounts values (2, 'gormac@gmail.com', 'gormac', 'password', 'salt');
-insert into doctors values (1, 'Dawid', 'Liwocha', 'lek. dent.', 'Mazowiecka 10', '97-400', 'Bełchatów', 'Polska', '663683233', 1);
-insert into doctors values (2, 'Maciej', 'Gorczyca', 'lek. dent.', 'Warszawska 20', '97-400', 'Bełchatów', 'Polska', '604875332', 2);
+ALTER TABLE `configurations` ADD CONSTRAINT `configurations_fk0` FOREIGN KEY (`doctor_id`) REFERENCES `doctors`(`doctor_id`);
